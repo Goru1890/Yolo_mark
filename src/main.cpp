@@ -10,7 +10,7 @@
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
-
+#include <Windows.h>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/version.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -218,6 +218,32 @@ class comma : public std::numpunct<char> {
   protected:
   char do_decimal_point() const { return '.'; }
 };
+
+int lastImage(std::string& path){
+
+    int counter = 0;
+    WIN32_FIND_DATA ffd;
+    HANDLE hFind = INVALID_HANDLE_VALUE;
+    path+= "\\*.txt";
+
+    // Start iterating over the files in the path directory.
+    hFind = ::FindFirstFileA (path.c_str(), &ffd);
+    
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do // Managed to locate and create an handle to that folder.
+        { 
+            counter++;
+        } while (::FindNextFile(hFind, &ffd) == TRUE);
+        ::FindClose(hFind);
+    } else {
+        printf("Failed to find path: %s", path.c_str());
+    }
+
+    return counter;
+
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -894,6 +920,12 @@ int main(int argc, char* argv[])
       case 'o': // o
       case 1048687: // o
         tracker_copy_previous_marks = 1;
+        ++trackbar_value;
+        break;
+
+      case 'l': // l
+      case 1048684: // l
+        trackbar_value = lastImage(images_path);
         ++trackbar_value;
         break;
 
