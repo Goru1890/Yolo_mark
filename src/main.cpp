@@ -223,23 +223,22 @@ int lastImage(std::string& path){
 
     int counter = 0;
     WIN32_FIND_DATA ffd;
-    HANDLE hFind = INVALID_HANDLE_VALUE;
     path+= "\\*.txt";
 
-    // Start iterating over the files in the path directory.
-    hFind = ::FindFirstFileA (path.c_str(), &ffd);
+    HANDLE hFind;
+
+    hFind = FindFirstFile(path.c_str(), &ffd);
     
-    if (hFind != INVALID_HANDLE_VALUE)
+    if (hFind != INVALID_HANDLE_VALUE) 
     {
-        do // Managed to locate and create an handle to that folder.
-        { 
+        do {
+            //wcout << FindFileData.cFileName << "\n";
             counter++;
-        } while (::FindNextFile(hFind, &ffd) == TRUE);
-        ::FindClose(hFind);
-    } else {
+        } while (FindNextFile(hFind, &ffd));
+        FindClose(hFind);
+    }else {
         printf("Failed to find path: %s", path.c_str());
     }
-
     return counter;
 
 }
@@ -489,6 +488,7 @@ int main(int argc, char* argv[])
 
       // selected new image
       if (old_trackbar_value != trackbar_value || exit_flag) {
+        
         trackbar_value = std::min(std::max(0, trackbar_value), (int)jpg_filenames_path.size() - 1);
         cv::setTrackbarPos(trackbar_name, window_name, trackbar_value);
         frame(cv::Rect(0, 0, frame.cols, preview.rows)) = cv::Scalar::all(0);
@@ -530,6 +530,7 @@ int main(int argc, char* argv[])
             // store [path/image name.jpg] to train.txt
             auto it = std::find(difference_filenames.begin(), difference_filenames.end(), filename_without_ext);
             if (it != difference_filenames.end()) {
+              std::cout << " Writing in txt \n" << std::endl;
               ofs_train << images_path << "/" << jpg_filename << std::endl;
               ofs_train.flush();
 
@@ -537,7 +538,7 @@ int main(int argc, char* argv[])
               difference_filenames.resize(new_size);
             }
           } catch (...) {
-            std::cout << " Exception when try to write txt-file \n";
+            std::cout << " Exception when try to write txt-file \n" << std::endl;
           }
         }
 
@@ -925,8 +926,10 @@ int main(int argc, char* argv[])
 
       case 'l': // l
       case 1048684: // l
-        trackbar_value = lastImage(images_path);
-        ++trackbar_value;
+
+        //trackbar_value ++;
+        trackbar_value = lastImage(images_path); 
+        images_path = std::string(argv[1]);
         break;
 
       case 32: // SPACE
@@ -960,7 +963,7 @@ int main(int argc, char* argv[])
         break;
       case 'w': // w
       case 1048695: // w
-        mark_line_width = mark_line_width % MAX_MARK_LINE_WIDTH + 1;
+        mark_line_width = mark_line_width % MAX_MARK_LINE_WIDTH;
         break;
       case 'h': // h
       case 1048680: // h
