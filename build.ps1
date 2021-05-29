@@ -126,6 +126,7 @@ else {
 }
 Write-Host "Setting up environment to use CMake generator: $generator" -ForegroundColor Yellow
 
+
 if ($null -eq (Get-Command "nvcc.exe" -ErrorAction SilentlyContinue)) {
   if (Test-Path env:CUDA_PATH) {
     $env:PATH += ";${env:CUDA_PATH}\bin"
